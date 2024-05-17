@@ -6,7 +6,7 @@ import AddItem from './AddItem';
 import SearchItem from './SearchItem';
 import apiRequest from './apiRequest';
 function App() {
-  const API_URL ="http://localhost:3500/items";
+  //const API_URL ="https://To-do-List.onrender.com";
   const [items, setItems] = useState([]);
   const [newItem, setNewItem] = useState('')
 const [search,setSearch] =useState('')
@@ -24,7 +24,7 @@ useEffect(()=>{
   //JSON.parse(localStorage.getItem('todo_List'))
   const fetchItems = async () => {
     try{
-      const res= await fetch(API_URL);
+      const res= await fetch(`${process.env.API_URL}/items`);
       //console.log(res);
       if(!res.ok) throw Error("Data fetch error");
       const listItems = await res.json();

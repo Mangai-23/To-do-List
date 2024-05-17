@@ -1,17 +1,17 @@
-// server.js
-const express = require('express');
-const path = require('path');
-const app = express();
+const jsonServer = require("json-server");
+const cors = require("cors");
+const path = require("path");
+const server = jsonServer.create();
+const router = jsonServer.router(path.join(__dirname, "data", "db.json"));
+const middlewares = jsonServer.defaults();
 
-const PORT = process.env.PORT || 9000; // Use the port provided by Render
+server.use(cors());
+server.use(jsonServer.bodyParser);
+server.use(middlewares);
+server.use(router);
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, 'build')));
+const PORT = process.env.PORT || 3000;
 
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`JSON Server is running on http://localhost:${PORT}`);
 });
