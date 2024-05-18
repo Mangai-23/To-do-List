@@ -7,21 +7,16 @@ import SearchItem from './SearchItem';
 
 function App() {
   const [items, setItems] = useState([
-    {
-      "id": "1",
-      "checked": false,
-      "item": "Coding"
-    },
-    {
-      "id": "2",
-      "checked": true,
-      "item": "Blockchain"
-    },
-    {
-      "id": "3",
-      "checked": true,
-      "item": "Machine Learning"
-    }
+    { id: 1, checked: true, item: 'Learn React' },
+    { id: 2, checked: true, item: 'Learn TailwindCss' },
+    { id: 3, checked: false, item: 'Learn Node' },
+    { id: 4, checked: true, item: 'Learn Express' },
+    { id: 5, checked: true, item: 'Learn MongoDB' },
+    { id: 6, checked: false, item: 'Learn Mongoose' },
+    { id: 7, checked: false, item: 'Learn GraphQL' },
+    { id: 8, checked: false, item: 'Learn Apollo' },
+    { id: 9, checked: false, item: 'Learn Firebase' },
+    { id: 10, checked: true, item: 'Learn AWS' },
   ]);
   const [newItem, setNewItem] = useState('');
   const [search, setSearch] = useState('');
