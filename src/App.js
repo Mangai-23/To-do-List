@@ -1,148 +1,95 @@
 import Header from './Header';
 import Content from './Content';
 import Footer from './Footer';
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 import AddItem from './AddItem';
 import SearchItem from './SearchItem';
-import apiRequest from './apiRequest';
+
 function App() {
-const API_URL ="https://To-do-List.onrender.com";
-const jsonServer = require("json-server"); // importing json-server library
-const server = jsonServer.create();
-const router = jsonServer.router("db.json");
-const middlewares = jsonServer.defaults();
-const port = process.env.PORT || 8080; //  chose port from here like 8080, 3001
-
-server.use(middlewares);
-server.use(router);
-
-server.listen(port);
-const [items, setItems] = useState([]);
-const [newItem, setNewItem] = useState('')
-const [search,setSearch] =useState('')
-const [newerror, setNewError] = useState(null);
-const [isLoad, setIsLoad] = useState(true);
-//Function is update the Local Storage
-
-// const updateStore = (listItems) =>
-// {
-//   setItems(listItems)
-//   //localStorage.setItem("todo_List" , JSON.stringify(listItems))
-// }
-
-useEffect(()=>{
-  //JSON.parse(localStorage.getItem('todo_List'))
-  const fetchItems = async () => {
-    try{
-      const res= await fetch(`${API_URL}/items`);
-      //console.log(res);
-      if(!res.ok) throw Error("Data fetch error");
-      const listItems = await res.json();
-      //console.log(listItems);
-      setItems(listItems);
-      setNewError(null);
-    }
-    catch(err){
-      // console.log(err.stack)
-      setNewError(err.message);
-      // console.log(newerror)
-    }
-    finally{
-      setIsLoad(false)
-    }
-  }
-
-  setTimeout(() =>{
-    (async () => await fetchItems())();
-  },2000)
-  
-},[]) 
-console.log(newerror);
-const addItem = async (item) => {
-  const id =items.length ? items[items.length - 1].id +1 : 1;
-  console.log(id);
-  const addNewItem ={id,checked:false, item}
-  const listItems =[...items,addNewItem]
-  setItems(listItems)
-  const postOptions = {
-    method: "POST",
-    headers:{
-      'Content-Type': 'application/json'
+  const [items, setItems] = useState([
+    {
+      "id": "1",
+      "checked": false,
+      "item": "Coding"
     },
-    body: JSON.stringify(addNewItem)
-  }
-   const result = await apiRequest(API_URL, postOptions);
-   if(result)
-   {
-    setNewError(result)
-   }
-}
-const handleCheck = async(id) => {
-  const listItems = items.map((item) => item.id === id ? {...item, checked:!item.checked} : item)
-  setItems(listItems)
-   const myitem = listItems.filter((item) => item.id === id)
-   const updateOptions = {
-    method: 'PATCH',
-    headers:{
-      'Content-Type': 'application/json'
+    {
+      "id": "2",
+      "checked": true,
+      "item": "Blockchain"
     },
-    body: JSON.stringify({checked:myitem[0].checked})
-  }
-   const requrl =  `${API_URL}/${id}`
-   const result = await apiRequest(requrl, updateOptions);
-   if(result)
-   {
-    setNewError(result)
-   }
-}
-const handleDelete = async(id) => {
-  const listItems = items.filter((item) => item.id !== id)
-  setItems(listItems)
-   const delOptions = {
-    method: 'DELETE',
-  }
-   const requrl =  `${API_URL}/${id}`
-   const result = await apiRequest(requrl, delOptions);
-   if(result)
-   {
-    setNewError(result)
-   }
-}
+    {
+      "id": "3",
+      "checked": true,
+      "item": "Machine Learning"
+    }
+  ]);
+  const [newItem, setNewItem] = useState('');
+  const [search, setSearch] = useState('');
+  const [newError, setNewError] = useState(null);
+  const [isLoad, setIsLoad] = useState(true);
 
-const  handleSubmit = (e) =>{
-  e.preventDefault();
-  if(!newItem) return;  
-  console.log(newItem);
-  addItem(newItem)
-  setNewItem('')
-}
+  useEffect(() => {
+    const storedItems = JSON.parse(localStorage.getItem('todo_List'));
+    if (storedItems) {
+      setItems(storedItems);
+    }
+    setIsLoad(false);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('todo_List', JSON.stringify(items));
+  }, [items]);
+
+  const addItem = (item) => {
+    const id = items.length ? items[items.length - 1].id + 1 : 1;
+    const addNewItem = { id, checked: false, item };
+    const listItems = [...items, addNewItem];
+    setItems(listItems);
+  };
+
+  const handleCheck = (id) => {
+    const listItems = items.map((item) => item.id === id ? { ...item, checked: !item.checked } : item);
+    setItems(listItems);
+  };
+
+  const handleDelete = (id) => {
+    const listItems = items.filter((item) => item.id !== id);
+    setItems(listItems);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!newItem) return;
+    addItem(newItem);
+    setNewItem('');
+  };
+
   return (
     <div className="App">
-        <Header title="To do List"/>
-        <AddItem 
-          newItem ={newItem}
-          setNewItem ={setNewItem}
-          handleSubmit={handleSubmit}
-        />
-        <SearchItem 
-          search ={search}
-          setSearch ={setSearch}
-        />
-        <main>
-        {isLoad && <p> {`Loading Items...`}</p>}
-          {newerror && <p> {`Error: ${newerror}`}</p>}
-          {!isLoad && !newerror && <Content 
-            items ={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}
-            handleCheck={handleCheck}
-            handleDelete={handleDelete}
-          />}
-        </main>
-        <Footer 
-          length = {items.length} 
-        />
+      <Header title="To do List" />
+      <AddItem
+        newItem={newItem}
+        setNewItem={setNewItem}
+        handleSubmit={handleSubmit}
+      />
+      <SearchItem
+        search={search}
+        setSearch={setSearch}
+      />
+      <main>
+        {isLoad && <p>{`Loading Items...`}</p>}
+        {newError && <p>{`Error: ${newError}`}</p>}
+        {!isLoad && !newError && <Content
+          items={items.filter(item => ((item.item).toLowerCase()).includes(search.toLowerCase()))}
+          handleCheck={handleCheck}
+          handleDelete={handleDelete}
+        />}
+      </main>
+      <Footer
+        length={items.length}
+      />
     </div>
   );
-} 
+}
 
 export default App;
-
