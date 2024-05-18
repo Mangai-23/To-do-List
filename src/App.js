@@ -6,9 +6,19 @@ import AddItem from './AddItem';
 import SearchItem from './SearchItem';
 import apiRequest from './apiRequest';
 function App() {
-  //const API_URL ="https://To-do-List.onrender.com";
-  const [items, setItems] = useState([]);
-  const [newItem, setNewItem] = useState('')
+const API_URL ="https://To-do-List.onrender.com";
+const jsonServer = require("json-server"); // importing json-server library
+const server = jsonServer.create();
+const router = jsonServer.router("db.json");
+const middlewares = jsonServer.defaults();
+const port = process.env.PORT || 8080; //  chose port from here like 8080, 3001
+
+server.use(middlewares);
+server.use(router);
+
+server.listen(port);
+const [items, setItems] = useState([]);
+const [newItem, setNewItem] = useState('')
 const [search,setSearch] =useState('')
 const [newerror, setNewError] = useState(null);
 const [isLoad, setIsLoad] = useState(true);
@@ -24,7 +34,7 @@ useEffect(()=>{
   //JSON.parse(localStorage.getItem('todo_List'))
   const fetchItems = async () => {
     try{
-      const res= await fetch(`${process.env.API_URL}/items`);
+      const res= await fetch(`${API_URL}/items`);
       //console.log(res);
       if(!res.ok) throw Error("Data fetch error");
       const listItems = await res.json();
@@ -35,6 +45,7 @@ useEffect(()=>{
     catch(err){
       // console.log(err.stack)
       setNewError(err.message);
+      // console.log(newerror)
     }
     finally{
       setIsLoad(false)
@@ -46,7 +57,7 @@ useEffect(()=>{
   },2000)
   
 },[]) 
-
+console.log(newerror);
 const addItem = async (item) => {
   const id =items.length ? items[items.length - 1].id +1 : 1;
   console.log(id);
